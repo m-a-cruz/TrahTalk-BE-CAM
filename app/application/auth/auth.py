@@ -1,0 +1,83 @@
+from flask import request, jsonify, make_response
+import datetime
+from management.database import database
+from datetime import timedelta
+import re
+import management.cipherprivatekey as cipher
+import management.encryptpassword as encrypt
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+# import application.gas as notification
+
+def is_valid_email(email):
+    return re.match(r"[^@]+@[^@]+\.[^@]+", email)
+
+def register():
+    data = request.json
+    
+    if not data or not all(key in data for key in ["name", "email", "accessCode", "password", "confirmPassword"]):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    if not is_valid_email(data["email"]):
+        return jsonify({"error": "Invalid email format"}), 400
+
+    if data["accessCode"] != cipher.REGISTRATION_KEY:
+        return jsonify({"error": "Invalid encryption key"}), 403
+
+    if len(data["password"]) < 6:
+        return jsonify({"error": "Password must be at least 6 characters long"}), 400
+    
+    if data["password"] != data["confirmPassword"]:
+        return jsonify({"error": "Passwords do not match"}), 400    
+    
+    if database.users_collection.find_one({"email": data["email"]}):
+        return jsonify({"error": "User already exists"}), 400
+    
+    user = {"name": data["name"], "email":data["email"], 
+            "password": encrypt.hash_password(data["password"]), "created_at": datetime.datetime.utcnow()}
+    database.users_collection.insert_one(user)
+    return jsonify({"message": "User registered successfully"}), 201
+
+def login():
+    data = request.json
+    print(f"[DEBUG] Received data: {data}")
+    
+    if not data or not all(key in data for key in ["email", "password"]):
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    if not is_valid_email(data["email"]):
+        return jsonify({"error": "Invalid email format"}), 400
+    
+    if len(data["password"]) < 6:
+        return jsonify({"error": "Password must be at least 6 characters long"}), 400
+    
+    if not database.users_collection.find_one({"email": data["email"]}):
+        return jsonify({"error": "User does not exists"}), 400
+    
+    user = database.users_collection.find_one({"email": data["email"]})
+    
+    if not user or not encrypt.check_password(user["password"], data["password"]):
+        return jsonify({"error": "Invalid credentials"}), 401
+    
+    token = create_access_token(identity=data["email"], expires_delta=timedelta(hours=3))
+
+    response = make_response(jsonify({"message": "Login successful"}))
+    response.set_cookie(
+        "access_token_cookie",
+        token,
+        secure=True,  # Use True for HTTPS in production
+        httponly=True,  # Prevent access via JavaScript
+        samesite="None",  # Adjust based on your use case, e.g., "None" for cross-origin
+        max_age=3 * 60 * 60  # Cookie expires after 3 hours
+    )
+    
+    # print(f"[DEBUG] Set-Cookie Header: {response.headers.get('Set-Cookie')}")
+    return response
+    
+def logout():
+    response = make_response(jsonify({"message": "Logout successful"}))
+    response.set_cookie(
+        "access_token_cookie", 
+        "", 
+        expires=0
+    )
+    return response
