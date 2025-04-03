@@ -69,8 +69,6 @@ def login():
         samesite="None",  # Adjust based on your use case, e.g., "None" for cross-origin
         max_age=3 * 60 * 60  # Cookie expires after 3 hours
     )
-    
-    print(f"[DEBUG] Set-Cookie Header: {response.headers.get('Set-Cookie')}")
     return response
 
     
