@@ -64,7 +64,7 @@ def login():
     response.set_cookie(
         "access_token_cookie",
         token,
-        secure=False,  # Use True for HTTPS in production
+        secure=True,  # Use True for HTTPS in production
         httponly=True,  # Prevent access via JavaScript
         samesite="None",  # Adjust based on your use case, e.g., "None" for cross-origin
         max_age=3 * 60 * 60  # Cookie expires after 3 hours
