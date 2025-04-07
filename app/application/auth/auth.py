@@ -20,7 +20,7 @@ def register():
     if not is_valid_email(data["email"]):
         return jsonify({"error": "Invalid email format"}), 400
 
-    if data["accessCode"] != cipher.REGISTRATION_KEY:
+    if data["accessCode"] != cipher.CiperPrivateKey.REGISTRATION_KEY:
         return jsonify({"error": "Invalid encryption key"}), 403
 
     if len(data["password"]) < 6:
