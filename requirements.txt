@@ -1,3 +1,4 @@
+APScheduler==3.11.0
 bcrypt==4.2.1
 blinker==1.9.0
 cachetools==5.5.2
@@ -61,6 +62,7 @@ stanio==0.5.1
 threadpoolctl==3.6.0
 tqdm==4.67.1
 tzdata==2025.2
+tzlocal==5.3.1
 uritemplate==4.1.1
 urllib3==2.3.0
 Werkzeug==3.1.3
