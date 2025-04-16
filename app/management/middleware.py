@@ -1,6 +1,8 @@
 from flask import request, jsonify
 from functools import wraps
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+import re
+import app.management.config as config
 
 def log_request(f):
     @wraps(f)
@@ -24,86 +26,48 @@ def protected_route(f):
             return jsonify({"error": "Unauthorized"}), 401
     return decorated
 
+def handle_errors(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+    return wrapper
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def token_required(f):
-#     @wraps(f)
-#     def decorated(*args, **kwargs):
-#         token = request.headers.get("Authorization")
-
-#         if not token:
-#             return jsonify({"message": "Token is missing"}), 401
+def validate_request_keys(data, required_keys):
+    email_regex = r"[^@]+@[^@]+\.[^@]+"
+    password_regex = r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$'
+    
+    try:
+        if not data or not all(key in data for key in required_keys):
+            return {"error": "Missing required fields"}, 400
+    
+        if "email" in data and not re.match(email_regex, data["email"]):
+            return {"error": "Invalid email format"}, 400
         
-#         # Check if token follows "Bearer <token>" format
-#         if "Bearer" in token:
-#             token = token.split()[1]
+        if 'password' in data and not re.match(password_regex, data["password"]):
+            return {"error": "Password must be at least 8 characters long and include both letters and numbers"}, 400
+                
+        if 'newPassword' in data and not re.match(password_regex, data["newPassword"]):
+            return {"error": "Password must be at least 8 characters long and include both letters and numbers"}, 400
         
-#         try:
-#             # Decode the token using a secret key and validate algorithm
-#             decoded = jwt.decode(token, encrypt.SECRET_KEY, algorithms=["HS256"])
-#             request.user = decoded  # Save decoded user data in request
-#         except jwt.ExpiredSignatureError:
-#             return jsonify({"message": "Token expired!"}), 401
-#         except jwt.InvalidTokenError:
-#             return jsonify({"message": "Token is invalid"}), 401
+        if 'confirmPassword' in data:
+            if not re.match(password_regex, data["confirmPassword"]):
+                return {"error": "Password must be at least 8 characters long and include both letters and numbers"}, 400
+            
+            if "password" in data and data["password"] != data["confirmPassword"]:
+                return {"error": "Passwords do not match"}, 400
+            
+            if "newPassword" in data and data["newPassword"] != data["confirmPassword"]:
+                return {"error": "Passwords do not match"}, 400
         
-#         return f(*args, **kwargs)
-#     return decorated
-
-
-# def token_required(f):
-#     @wraps(f)
-#     def decorated(*args, **kwargs):
-#         token = request.headers.get("Authorization")
-
-#         if not token:
-#             return jsonify({"message": "Token is missing"}), 401
-#         try:
-#             # decoded = jwt.decode(token.split()[1], cipher.SECRET_KEY, algorithms=["HS256"])
-#             request.user = encrypt.decode_token(token)
-#         except jwt.ExpiredSignatureError:
-#             return jsonify({"message": "Token expired!"}), 401
-#         except jwt.InvalidTokenError:
-#             return jsonify({"message": "Token is invalid"}), 401
-#         return f(*args, **kwargs)
-#     return decorated
-
+        if "accessCode" in data and data["accessCode"] != config.cipher.REGISTRATION_KEY:
+            return {"error": "Invalid encryption key"}, 403
+        
+        return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return {"error": "Internal server error"}, 500
 
     
     
-# def protected_route():
-#     token = request.cookies.get("auth_token")  
-#     if token == "example_token":
-#         return jsonify({"message": "Access granted"}), 200
-#     else:
-#         return jsonify({"message": "Unauthorized"}), 401

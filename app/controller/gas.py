@@ -1,6 +1,6 @@
 from flask import jsonify,Response, request
 from bson import json_util
-from management.database import database
+from app.management.config import database
 import datetime
 
 def record_gas_level():

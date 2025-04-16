@@ -1,1 +1,10 @@
+# Ignore the virtual environment directory
+.venv/
+
+# Ignore __pycache__ directories within the .venv folder
+.venv/__pycache__/
 .env
+prophet_model.pkl
+
+# Ignore __pycache__ directories anywhere in the project
+__pycache__/
