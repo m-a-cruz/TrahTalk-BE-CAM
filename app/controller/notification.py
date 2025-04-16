@@ -2,7 +2,6 @@ from flask import jsonify,Response, request
 from bson import json_util, ObjectId
 from app.management.config import database
 import datetime
-import app.management.middleware as middleware
 
 def fetch_notif():
     notification = list(database.notification_collection.find().sort("timestamp", -1))

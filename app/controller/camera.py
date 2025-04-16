@@ -4,6 +4,7 @@ import base64
 import datetime
 from flask import request, jsonify, Response
 from app.management.config import database
+from bson import json_util, ObjectId
 
 
 def upload_image():
@@ -26,6 +27,7 @@ def upload_image():
             "timestamp": datetime.datetime.utcnow(),
             "image_data": encoded_image,
             "description": "grayscale",
+            "type": "raw",
         })
 
         return jsonify({"message": "Raw image received and stored"}), 200
@@ -36,9 +38,11 @@ def upload_image():
     
 
 def view_latest_image():
-    doc = database.image_collection.find_one(sort=[("timestamp", -1)])
-    if not doc:
+    image = database.image_collection.find_one(sort=[("timestamp", -1)])
+    if not image:
         return "No image found", 404
+    
+    response = Response(json_util.dumps(image), mimetype='application/json')
 
-    img_data = base64.b64decode(doc["image_data"])
-    return Response(img_data, mimetype='image/jpeg')
+    # img_data = base64.b64decode(doc["image_data"])
+    return response, 200

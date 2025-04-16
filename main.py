@@ -2,17 +2,21 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
-from app.routes import auth, gas, predict, camera
+from app.routes import auth, gas, camera
 from app.management.middleware import log_request, protected_route
 from app.management.config import AppConfig
 import sys
 from os.path import abspath, dirname
+from scheduler import start_scheduler
 
 sys.path.append(abspath(dirname(__file__)))
 
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# Start the scheduler
+start_scheduler()
 
 # Load configurations from AppConfig
 app.config["JWT_SECRET_KEY"] = AppConfig.JWT_SECRET_KEY
@@ -39,10 +43,8 @@ def protected():
     protected_route(request)
     return jsonify({"message": "You have access to this route!"}), 200
 
-# Register blueprints
 app.register_blueprint(auth.auth_bp)
 app.register_blueprint(gas.gas_bp)
-# app.register_blueprint(predict.predict_bp)
 app.register_blueprint(camera.camera_bp)
 
 if __name__ == "__main__":
