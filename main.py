@@ -39,8 +39,8 @@ def before_request():
     log_request(request)
 
 @app.route("/protected", methods=["GET"])
-def protected(): 
-    protected_route(request)
+@protected_route
+def protected():
     return jsonify({"message": "You have access to this route!"}), 200
 
 app.register_blueprint(auth.auth_bp)
