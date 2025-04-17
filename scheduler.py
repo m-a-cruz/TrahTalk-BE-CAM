@@ -14,7 +14,7 @@ def start_scheduler():
     scheduler.add_job(
         func=safe_train_prophet,
         trigger='interval',
-        hours=3,
+        hours=1,
         id='prophet_training'
     )
     scheduler.start()
