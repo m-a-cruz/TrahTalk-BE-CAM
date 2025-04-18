@@ -1,7 +1,6 @@
 from flask import Blueprint
 from app.controller import camera
-from flask_jwt_extended import jwt_required
-from app.management.middleware import handle_errors
+from app.management.middleware import handle_errors, protected_route
 
 camera_bp = Blueprint('camera', __name__, url_prefix='/api/camera')
 
@@ -10,6 +9,6 @@ camera_bp = Blueprint('camera', __name__, url_prefix='/api/camera')
 def upload_image(): return camera.upload_image()
 
 @camera_bp.route('/latest', methods=['GET'], endpoint='view_latest_image')
-@jwt_required
+@protected_route
 @handle_errors
 def view_latest_image(): return camera.view_latest_image()

@@ -1,7 +1,6 @@
 from flask import Blueprint
 from app.controller import gas, notification
-from flask_jwt_extended import jwt_required
-from app.management.middleware import handle_errors
+from app.management.middleware import handle_errors, protected_route
 
 gas_bp = Blueprint('gas', __name__, url_prefix='/api/gas')
 
@@ -10,7 +9,7 @@ gas_bp = Blueprint('gas', __name__, url_prefix='/api/gas')
 def create_gas_records(): return gas.record_gas_level()
 
 @gas_bp.route('/charts', methods=['GET'], endpoint='get_gas_chart')
-@jwt_required
+@protected_route
 @handle_errors
 def get_gas_chart(): return gas.fetch_gas_chart()
 
@@ -20,6 +19,6 @@ def get_gas_chart(): return gas.fetch_gas_chart()
 def create_notification(): return notification.record_notif_data()
 
 @gas_bp.route('/notifications', methods=['GET'], endpoint='get_notifications')
-@jwt_required
+@protected_route
 @handle_errors
 def get_notifications(): return notification.fetch_notif()

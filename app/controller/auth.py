@@ -44,6 +44,10 @@ def logout():
     response.set_cookie(
         "access_token_cookie", 
         "", 
-        expires=0
+        expires=0, 
+        path="/", 
+        httponly=True, 
+        samesite="None", 
+        secure=True
     )
     return response

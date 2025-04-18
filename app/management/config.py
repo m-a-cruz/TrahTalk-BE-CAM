@@ -15,6 +15,7 @@ class database:
     image_collection = db[f"{os.environ.get('IMAGE_COLLECTION')}"]
     prediction_models_collection = db[f"{os.environ.get('PREDICTION_MODELS')}"]
     gas_trends_collection = db[f"{os.environ.get('GAS_TRENDS')}"]
+    insight_collection = db[f"{os.environ.get('INSIGHT_COLLECTIONS')}"]
     
 class cipher:
     REGISTRATION_KEY = os.environ.get("REGISTRATION_KEY")

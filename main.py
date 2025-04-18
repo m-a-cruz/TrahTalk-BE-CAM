@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
-from app.routes import auth, gas, camera
+from app.routes import auth, gas, camera, insight
 from app.management.middleware import log_request, protected_route
 from app.management.config import AppConfig
 import sys
@@ -39,13 +39,15 @@ def before_request():
     log_request(request)
 
 @app.route("/protected", methods=["GET"])
-def protected(): 
-    protected_route(request)
+@protected_route
+def protected():
     return jsonify({"message": "You have access to this route!"}), 200
 
 app.register_blueprint(auth.auth_bp)
 app.register_blueprint(gas.gas_bp)
 app.register_blueprint(camera.camera_bp)
+app.register_blueprint(insight.insight_bp)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
