@@ -38,8 +38,11 @@ def upload_image():
             f.write(img_bytes)
 
         img = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
+
         if img is None:
             return jsonify({'error': 'Failed to decode image'}), 400
+        
+        img = cv2.resize(img, (640, 480)) 
 
         results = model(img)
 
