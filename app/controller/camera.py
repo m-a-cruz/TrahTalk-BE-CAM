@@ -79,7 +79,7 @@ def process_latest():
         {"_id": doc["_id"]},
         {
             "$set": {
-                "detected_objects": detections,
+                "detections": detections,
                 "image_annotated_base64": annotated_encoded,
                 "processed": True
             }
