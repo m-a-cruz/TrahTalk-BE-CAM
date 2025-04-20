@@ -39,7 +39,8 @@ def upload_image():
     database.image_collection.insert_one({
         "timestamp": datetime.datetime.utcnow(),
         "image_raw_base64": encoded,
-        "type": "raw",
+        "type": "uploaded",
+        "processed": False
     })
 
     return jsonify({"message": "Image uploaded successfully"}), 200
