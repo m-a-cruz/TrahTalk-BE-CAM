@@ -10,5 +10,4 @@ def upload_image(): return camera.upload_image()
 
 @camera_bp.route('/process', methods=['GET'], endpoint='process_latest')
 @handle_errors
-@protected_route
 def process_latest(): return camera.process_latest()
