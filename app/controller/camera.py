@@ -10,6 +10,8 @@ import logging
 
 # Set up logging for debugging
 logging.basicConfig(level=logging.DEBUG)
+logging.getLogger('pymongo').setLevel(logging.WARNING)
+logging.info("App started")
 
 # Load your YOLO model once (outside the function)
 model = YOLO("app/model/my_model.pt")
