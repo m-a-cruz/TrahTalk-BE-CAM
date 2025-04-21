@@ -8,6 +8,6 @@ camera_bp = Blueprint('camera', __name__, url_prefix='/api/camera')
 @handle_errors 
 def upload_image(): return camera.upload_image()
 
-@camera_bp.route('/process', methods=['GET'], endpoint='process_latest')
-@handle_errors
-def process_latest(): return camera.process_latest()
+# @camera_bp.route('/process', methods=['GET'], endpoint='process_latest')
+# @handle_errors
+# def process_latest(): return camera.process_latest()
