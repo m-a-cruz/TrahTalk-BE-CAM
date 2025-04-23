@@ -124,7 +124,7 @@ def upload_image():
             return jsonify({'error': 'Failed to decode image'}), 400
         
         # Resize the image to fit YOLO model input size (adjust if needed)
-        img = cv2.resize(img, (224, 224))  # Resizing to a square shape if needed
+        img = cv2.resize(img, (640, 640))  # Resizing to a square shape if needed
 
         # Run inference
         results = model(img)
